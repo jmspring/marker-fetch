@@ -60,6 +60,7 @@ var datapipe = {
             .of('/points')
             .on('connection', function(socket) {
                 var points = [];
+                var pointsreceived = false;
                 var markers = [];
                 var markerseq = 0;
                 var timer;
@@ -73,10 +74,12 @@ var datapipe = {
                                 socket.emit('point', JSON.stringify(points[markerseq]));
                                 markerseq++;
                             } else {
-                                socket.emit('done');
-                                if(timer) {
-                                    clearInterval(timer);
-                                    timer = null;
+                                if(pointsreceived) {
+                                    socket.emit('done');
+                                    if(timer) {
+                                        clearInterval(timer);
+                                        timer = null;
+                                    }
                                 }
                             }
                         }, 1000);
@@ -90,11 +93,13 @@ var datapipe = {
                             markers = data;
                             request_marker_details(markers, 0, function(data) {
                                 points = data;
+                                pointsreceived = true;
                             });
                         });
                     } else {
                         request_marker_details(markers, 0, function(data) {
                             points = data;
+                            pointsreceived = true;
                         });
                     }
                 });
