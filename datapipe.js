@@ -72,6 +72,12 @@ var datapipe = {
                             if(points.length > markerseq) {
                                 socket.emit('point', JSON.stringify(points[markerseq]));
                                 markerseq++;
+                            } else {
+                                socket.emit('done');
+                                if(timer) {
+                                    clearInterval(timer);
+                                    timer = null;
+                                }
                             }
                         }, 1000);
                     }
